@@ -190,6 +190,7 @@ def persist_id(collection_id, filename="data/collection_id.txt"):
         collection_id (str): The ID of the collection to persist.
         filename (str, optional): The file in which the collection ID is persisted.
     """
+    os.makedirs('data', exist_ok=True)
     file = open(filename, "w")
     file.write(collection_id)
     file.close()
