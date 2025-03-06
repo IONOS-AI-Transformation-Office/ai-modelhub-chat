@@ -1,0 +1,9 @@
+requests
+python-dotenv
+PyMuPDF
+python-docx
+nicegui
+starlette
+langchain>=0.2
+langchain-community
+langchain_openai
