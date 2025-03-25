@@ -1,7 +1,7 @@
 from nicegui import ui
 
-from paths import STORAGE_SECRET
-from ui.components import show_header, show_footer, show_chat, init_history
+from config import STORAGE_SECRET
+from ui.components import show_header, show_footer, show_chat
 
 @ui.page('/')
 def show():

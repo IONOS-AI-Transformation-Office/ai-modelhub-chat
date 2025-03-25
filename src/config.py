@@ -51,3 +51,15 @@ CHAT_HEADER_COLOR = '#061A3E'
 CHAT_FOOTER_PLACEHOLDER = 'start typing...'
 # Background color of the footer.
 CHAT_FOOTER_COLOR = '#FFFFFF'
+
+# Name to display for the user beside chat messages
+CHAT_USER_NAME = 'you'
+
+# Name to display for the bot beside chat messages
+CHAT_BOT_NAME = 'IONOS powered AI'
+
+# Symbol to show beside user chat messages
+CHAT_USER_IMAGE = "https://material-icons.github.io/material-icons/svg/face/round.svg"
+
+# Symbol to show beside bot chat messages
+CHAT_BOT_IMAGE = "https://material-icons.github.io/material-icons/svg/smart_toy/round.svg"

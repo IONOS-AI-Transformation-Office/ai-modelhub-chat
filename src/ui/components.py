@@ -2,13 +2,13 @@ from nicegui import app, ui
 from langchain_openai import ChatOpenAI
 from datetime import datetime
 
-from aimodelhub.vectordb import retrieve_documents, retrieve_id
-from paths import (
-    CHAT_HEADER_TITLE, CHAT_HEADER_COLOR,
-    CHAT_FOOTER_PLACEHOLDER, CHAT_FOOTER_COLOR,
-    CHAT_INSTRUCTIONS, CHAT_INITIAL_QUESTION, 
+from config import (
+    CHAT_BOT_IMAGE, CHAT_BOT_NAME, CHAT_HEADER_TITLE, CHAT_HEADER_COLOR,
+    CHAT_FOOTER_PLACEHOLDER, CHAT_FOOTER_COLOR, CHAT_USER_IMAGE, CHAT_USER_NAME,
     IONOS_API_TOKEN, LLM_NAME, LLM_BASE_URL, 
 )
+from ui.history import append_to_history, get_history, get_llm_prompt
+
 
 def show_header():
     """
@@ -94,9 +94,9 @@ def get_sender(sender_string):
         str: 'IONOS powered AI' if sender is 'system' and 'you' if sender is 'user'.
     """    
     if sender_string == 'system':
-        return 'IONOS powered AI'
+        return CHAT_BOT_NAME
     if sender_string == 'user':
-        return 'you'
+        return CHAT_USER_NAME
 
 
 def get_avatar(sender_string):
@@ -108,45 +108,9 @@ def get_avatar(sender_string):
         str: Bot if sender is 'system' and face if sender is 'user'.
     """
     if sender_string == 'system':
-        return "https://material-icons.github.io/material-icons/svg/smart_toy/round.svg"
+        return CHAT_BOT_IMAGE
     if sender_string == 'user':
-        return "https://material-icons.github.io/material-icons/svg/face/round.svg"
-    
-
-def get_history():
-    """
-    Complete chat history in the current chat.
-    Returns:
-        str: Chat history.
-    """
-    if 'history' not in app.storage.client:
-        init_history()
-
-    return app.storage.client['history']
-
-
-def init_history():
-    """
-    Initialises / resets the history of the chat.
-
-    Namely, it replaces the chat history with the instructions to the LLM and the
-    question to be initially displayed to the user.
-    """
-    app.storage.client['history'] = [ 
-        {'role': 'developer', 'content': CHAT_INSTRUCTIONS, 'sent': False},
-        {'role': 'system', 'content': CHAT_INITIAL_QUESTION, 'sent': False}  
-    ]
-
-
-def append_to_history(message):
-    """
-    Appends a new message to the chat history list.
-    Args:
-        message (dict): message to append.
-    """
-    history = get_history()
-    history.append(message)
-    app.storage.client['history'] = history
+        return CHAT_USER_IMAGE
 
 
 async def post_message(query_field):
@@ -194,22 +158,3 @@ def show_bot_message():
     """
     append_to_history({'role': 'system', 'content': '', 'sent': False})
     show_chat.refresh()
-
-
-def get_llm_prompt(query):
-    """
-    Takes a query as input, searches for all relevant documents in the vector database
-    and appends it to the chat history. The result is returned as prompt for the LLM.
-    Args:
-        query (str): Query the user entered into the chat window.
-    Returns:
-        list: Prompt to be used as the input of the LLM.
-    """
-    relevant_docs = retrieve_documents(collection_id=retrieve_id(), query_string=query)
-    print(f"The most relevant content is in files: {[entry['file_name'] for entry in relevant_docs]}")
-    prompt = [
-        {"role": "system", "content": "; ".join([entry['content'] for entry in relevant_docs])},
-    ]
-    prompt.extend(get_history())
-
-    return prompt

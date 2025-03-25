@@ -2,7 +2,7 @@ import requests
 import os
 import base64
 
-from paths import HEADERS, CHUNK_OVERLAP, CHUNK_SIZE, EMBEDDING_MODEL, DATA_BACKEND
+from config import HEADERS, CHUNK_OVERLAP, CHUNK_SIZE, EMBEDDING_MODEL, DATA_BACKEND
 from aimodelhub.documents import extract_text
 
 
@@ -124,44 +124,6 @@ def retrieve_documents(collection_id, query_string, num_documents=3):
             'content': base64.b64decode(entry['document']['properties']['content']).decode()
         } for entry in relevant_documents.json()['properties']['matches']
     ]
-
-
-def query_collection(collection_id, query_string, model_name="meta-llama/Llama-3.3-70B-Instruct", max_length=300, temperature=0.01):
-    """
-    Queries the collection and generates a response using a large language model.
-    Args:
-        collection_id (str): The ID of the collection to query.
-        query_string (str): The natural language query.
-        model_name (str, optional): The model name of the language generation model.
-        max_length (int, optional): The maximum length of the generated response. Defaults to 300.
-        temperature (float, optional): Controls the randomness of the model's output. Defaults to 0.01.
-    Returns:
-        dict: The response from the model, including the generated text.
-    """
-    endpoint = "https://openai.inference.de-txl.ionos.com/v1/chat/completions"
-    relevant_docs = retrieve_documents(collection_id=collection_id, query_string=query_string)
-    print(f"The most relevant content is in files: {[entry['file_name'] for entry in relevant_docs]}")
-    prompt = [
-        {"role": "system", "content": """
-            Please use the information specified as context to answer the question.
-            Formulate you answer in one sentence and be an honest AI. Answer in a list
-            of five bullet points each starting with a year and the milestone in about 20 words.
-         """},
-        {"role": "system", "content": "; ".join([entry['content'] for entry in relevant_docs])},
-        {"role": "user", "content": query_string}
-    ]
-    body = {
-        "model": model_name,
-        "messages": prompt,
-    }
-    response = requests.post(endpoint, json=body, headers=HEADERS)
-
-    if response.status_code == 200:
-        results = response.json()['choices'][0]['message']['content']
-        return results
-    else:
-        print(f"Error querying collection: {response.status_code} - {response.text}")
-        return None
 
 
 def delete_collection(collection_id):
